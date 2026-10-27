@@ -1,0 +1,13 @@
+# Versions used during development (Python 3.12)
+numpy>=2.0
+scipy>=1.17
+pandas>=2.2
+matplotlib>=3.10
+pyyaml>=6.0
+pyserial>=3.5
+opencv-python>=4.10
+mediapipe>=0.10.14
+
+# Install for your hardware (CUDA / ROCm / CPU) following the official instructions:
+torch>=2.4
+torch-geometric>=2.6

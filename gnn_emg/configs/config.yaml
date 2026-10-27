@@ -1,0 +1,107 @@
+# ─────────────────────────────────────────────────────────────────────────────
+#  GNN-EMG  |  SICHIRAY × NinaPro  —  Configuración central
+#  GATv2 Graph Autoencoder  |  Reconstrucción EMG + Predicción de gesto
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Rutas ───────────────────────────────────────────────────────────────────
+paths:
+  ninapro_root:  "../NinaPro"           # raíz con db1/ db2/ … db5/ …
+  ninapro_db:    "db5"                  # DB5: 16ch Myo, 200Hz, 53 gestos ★
+  sichiray_root: "../dataset"          # CSVs de tus capturas personales
+  checkpoints:   "checkpoints/"
+  logs:          "logs/"
+
+# ── Señal EMG — NinaPro DB5 ─────────────────────────────────────────────────
+ninapro:
+  fs:            200            # Hz (DB5)
+  n_channels:    16             # canales EMG Myo dual
+  window_ms:     200            # ventana de análisis (ms)
+  overlap_pct:   0.5            # solapamiento 50%
+  exercises:     [1, 2, 3]      # E1 (12 gestos básicos), E2 (8 prono-sup), E3 (9 agarre)
+  use_restimulus: true          # usar restimulus (más limpio que stimulus)
+  exclude_rest:  true           # excluir reposo (62% del dataset → sesga el modelo)
+  subjects:      [1]            # null = todos los sujetos
+
+# ── Señal EMG — Sichiray (tus datos) ────────────────────────────────────────
+sichiray:
+  fs:            200            # Hz (mismo que ESP32)
+  min_rows:      500            # ignorar CSVs muy cortos
+  gesture_map:                  # mapeo a índices enteros
+    "ABIERTA":   0
+    "PUNIO":     1
+    "INDICE":    2
+    "PAZ":       3
+    "OK":        4
+    "PULGAR_UP": 5
+    "PULGAR_DN": 6
+    "TRES":      7
+    "PINZA":     8
+    "TELEFONO":  9
+    "OTRO":      10
+    "—":         -1             # sin gesto detectado → ignorar
+  # Grupos de features → nodos virtuales del grafo sichiray
+  virtual_nodes:
+    raw_emg:      ["emg_raw", "emg_smooth", "emg_filt"]
+    energy:       ["emg_tkeo", "emg_rms", "emg_mav"]
+    complexity:   ["emg_wl", "emg_zc", "emg_envelope", "emg_rect"]
+    threshold:    ["muscle_active", "dt_active", "active_pct", "snr_db"]
+    hand_kine:    ["f_thumb", "f_index", "f_middle", "f_ring", "f_pinky", "pinch", "hand_speed"]
+
+# ── Construcción del grafo ───────────────────────────────────────────────────
+graph:
+  window_samples: 40            # = fs * window_ms / 1000
+  corr_threshold: 0.3           # |pearson| mínimo para crear arista
+  self_loops:    true           # auto-aristas en cada nodo
+  normalize_feat: false         # Z-score per-window destruye discriminabilidad
+
+# ── Arquitectura GATv2 Autoencoder ──────────────────────────────────────────
+model:
+  in_channels_nina:  41         # 40 raw EMG samples + 1 channel positional encoding
+  in_channels_sich:  7
+  hidden_channels:   128
+  latent_dim:        64
+  num_heads:         4
+  num_layers:        3
+  dropout:           0.2
+  n_gestures_nina:   53
+  n_gestures_sich:   11
+  decoder_hidden:    [128, 256]
+  use_batch_norm:    true
+  temporal_encoder:  "conv"     # GANADOR del benchmark vs BiLSTM
+
+# ── Entrenamiento Fase 1 — Pre-entrenamiento NinaPro ───────────────────────
+pretrain:
+  epochs:            300        # limitamos a 300 para el test rápido de sujeto 1
+  batch_size:        512
+  lr:                0.001
+  weight_decay:      0.0001
+  scheduler:         "cosine"
+  scheduler_T0:      80         # ciclo de decaimiento del coseno
+  loss_recon_weight: 0.5
+  loss_clf_weight:   2.0
+  loss_contrast_wt:  0.0
+  grad_clip:         1.0
+  val_split:         0.15
+  save_best:         "val_loss"
+
+# ── Entrenamiento Fase 2 — Fine-tuning Sichiray ────────────────────────────
+finetune:
+  epochs:            50
+  batch_size:        256
+  lr:                0.0002
+  weight_decay:      0.0001
+  freeze_encoder_epochs: 5
+  loss_recon_weight: 1.0
+  loss_clf_weight:   1.0
+  grad_clip:         1.0
+  val_split:         0.20
+
+# ── Inferencia en tiempo real ────────────────────────────────────────────────
+inference:
+  port:              null         # null = auto-detect, o "/dev/ttyUSB0"
+  baud:              115200
+  buffer_ms:         300          # buffer EMG antes de inferir (ms)
+  stride_ms:         100          # stride de la ventana deslizante (ms)
+  smoothing_window:  5            # votación mayoritaria sobre N frames
+  confidence_min:    0.50         # umbral mínimo de confianza para reportar
+  display:           true         # mostrar dashboard en tiempo real

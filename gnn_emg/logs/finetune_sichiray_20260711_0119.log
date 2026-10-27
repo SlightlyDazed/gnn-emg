@@ -1,0 +1,92 @@
+<frozen runpy>:128: RuntimeWarning: 'gnn_emg.train.finetune_sichiray' found in s
+ys.modules after import of package 'gnn_emg.train', but prior to execution of 'g
+nn_emg.train.finetune_sichiray'; this may result in unpredictable behaviour
+[Device] GPU: NVIDIA GeForce RTX 4050 Laptop GPU
+════════════════════════════════════════════════════════════
+  GNN-EMG  |  Fase 2: Fine-tuning Sichiray
+════════════════════════════════════════════════════════════
+  CSV root : /home/lex/Documentos/gnn_emg (1)/dataset
+  Pretrain : /home/lex/Documentos/gnn_emg (1)/gnn_emg/checkpoints/nina_best.pt
+[Sichiray] 1 CSVs encontrados en /home/lex/Documentos/gnn_emg (1)/dataset
+/home/lex/Documentos/gnn_emg (1)/gnn_emg/data/sichiray_dataset.py:171: DtypeWarn
+ing: Columns (0: swipe) have mixed types. Specify dtype option on import or set
+low_memory=False.
+  df = pd.read_csv(path)
+  ✓ sichiray_s01_20260711_010750_782003_fixed.csv →  5187 grafos
+[Sichiray] Dataset listo: 5,187 grafos | 12 clases posibles
+  ABIERTA      (clase  0):  1969 grafos
+  PUNIO        (clase  1):   527 grafos
+  INDICE       (clase  2):  1523 grafos
+  PAZ          (clase  3):  1168 grafos
+  Train: 4,150 | Val: 1,037
+[Checkpoint] Pesos cargados — missing: 0 | unexpected: 0
+EMGGraphAutoencoder(
+  encoder     = GATv2 (3 layers, hidden=128, latent=64)
+  domains     = ninapro (16N×41F) | sichiray (5N×7F)
+  parameters  = 831,764
+)
+
+────────────────────────────────────────────────────────────
+  Fase A: encoder CONGELADO (5 épocas)
+────────────────────────────────────────────────────────────
+/home/lex/CUDA/lib/python3.11/site-packages/torch_geometric/utils/_scatter.py:91
+: UserWarning: The usage of `scatter(reduce='max')` can be accelerated via the '
+torch-scatter' package, but it was not found
+  warnings.warn(
+[A] Epoch   1/5 | L=2.6167 | valL=2.3865 | acc=0.037 | 1.3s ★
+[A] Epoch   2/5 | L=2.1773 | valL=1.8777 | acc=0.429 | 0.5s ★
+[A] Epoch   3/5 | L=1.9287 | valL=1.6964 | acc=0.429 | 0.5s ★
+[A] Epoch   4/5 | L=1.8220 | valL=1.6123 | acc=0.429 | 0.5s ★
+[A] Epoch   5/5 | L=1.7754 | valL=1.5938 | acc=0.428 | 0.5s ★
+────────────────────────────────────────────────────────────
+  Fase B: entrenamiento COMPLETO (45 épocas)
+────────────────────────────────────────────────────────────
+[B] Epoch   1/45 | L=1.6326 | valL=1.3566 | acc=0.429 | 0.5s ★
+[B] Epoch   2/45 | L=1.4817 | valL=1.2539 | acc=0.462 | 0.5s ★
+[B] Epoch   3/45 | L=1.3711 | valL=1.2082 | acc=0.445 | 0.5s ★
+[B] Epoch   4/45 | L=1.3413 | valL=1.1835 | acc=0.439 | 0.5s ★
+[B] Epoch   5/45 | L=1.3261 | valL=1.1927 | acc=0.416 | 0.5s
+[B] Epoch   6/45 | L=1.2805 | valL=1.1758 | acc=0.421 | 0.6s ★
+[B] Epoch   7/45 | L=1.2675 | valL=1.1864 | acc=0.414 | 0.5s
+[B] Epoch   8/45 | L=1.2622 | valL=1.1780 | acc=0.428 | 0.5s
+[B] Epoch   9/45 | L=1.2422 | valL=1.1604 | acc=0.431 | 0.5s ★
+[B] Epoch  10/45 | L=1.2479 | valL=1.1500 | acc=0.436 | 0.5s ★
+[B] Epoch  11/45 | L=1.2311 | valL=1.1517 | acc=0.437 | 0.5s
+[B] Epoch  12/45 | L=1.2301 | valL=1.1345 | acc=0.443 | 0.5s ★
+[B] Epoch  13/45 | L=1.2236 | valL=1.1331 | acc=0.439 | 0.5s ★
+[B] Epoch  14/45 | L=1.2089 | valL=1.1354 | acc=0.439 | 0.5s
+[B] Epoch  15/45 | L=1.2040 | valL=1.1338 | acc=0.442 | 0.5s
+[B] Epoch  16/45 | L=1.2129 | valL=1.1331 | acc=0.442 | 0.5s ★
+[B] Epoch  17/45 | L=1.1913 | valL=1.1220 | acc=0.446 | 0.5s ★
+[B] Epoch  18/45 | L=1.1842 | valL=1.1188 | acc=0.445 | 0.5s ★
+[B] Epoch  19/45 | L=1.1910 | valL=1.1130 | acc=0.454 | 0.5s ★
+[B] Epoch  20/45 | L=1.1842 | valL=1.1136 | acc=0.476 | 0.5s
+[B] Epoch  21/45 | L=1.1878 | valL=1.1085 | acc=0.454 | 0.5s ★
+[B] Epoch  22/45 | L=1.1849 | valL=1.1115 | acc=0.466 | 0.5s
+[B] Epoch  23/45 | L=1.1844 | valL=1.0998 | acc=0.468 | 0.5s ★
+[B] Epoch  24/45 | L=1.1628 | valL=1.0923 | acc=0.465 | 0.5s ★
+[B] Epoch  25/45 | L=1.1623 | valL=1.0853 | acc=0.457 | 0.5s ★
+[B] Epoch  26/45 | L=1.1596 | valL=1.0847 | acc=0.464 | 0.5s ★
+[B] Epoch  27/45 | L=1.1685 | valL=1.0816 | acc=0.467 | 0.5s ★
+[B] Epoch  28/45 | L=1.1613 | valL=1.0790 | acc=0.475 | 0.5s ★
+[B] Epoch  29/45 | L=1.1543 | valL=1.0753 | acc=0.475 | 0.5s ★
+[B] Epoch  30/45 | L=1.1595 | valL=1.0764 | acc=0.498 | 0.5s
+[B] Epoch  31/45 | L=1.1395 | valL=1.0753 | acc=0.504 | 0.5s ★
+[B] Epoch  32/45 | L=1.1563 | valL=1.0708 | acc=0.500 | 0.5s ★
+[B] Epoch  33/45 | L=1.1455 | valL=1.0710 | acc=0.504 | 0.5s
+[B] Epoch  34/45 | L=1.1457 | valL=1.0672 | acc=0.503 | 0.5s ★
+[B] Epoch  35/45 | L=1.1383 | valL=1.0643 | acc=0.507 | 0.5s ★
+[B] Epoch  36/45 | L=1.1392 | valL=1.0658 | acc=0.506 | 0.5s
+[B] Epoch  37/45 | L=1.1463 | valL=1.0636 | acc=0.505 | 0.5s ★
+[B] Epoch  38/45 | L=1.1398 | valL=1.0645 | acc=0.507 | 0.5s
+[B] Epoch  39/45 | L=1.1454 | valL=1.0634 | acc=0.507 | 0.5s ★
+[B] Epoch  40/45 | L=1.1396 | valL=1.0645 | acc=0.509 | 0.5s
+[B] Epoch  41/45 | L=1.1464 | valL=1.0627 | acc=0.509 | 0.5s ★
+[B] Epoch  42/45 | L=1.1412 | valL=1.0645 | acc=0.512 | 0.5s
+[B] Epoch  43/45 | L=1.1426 | valL=1.0642 | acc=0.512 | 0.5s
+[B] Epoch  44/45 | L=1.1345 | valL=1.0649 | acc=0.509 | 0.5s
+[B] Epoch  45/45 | L=1.1469 | valL=1.0639 | acc=0.508 | 0.5s
+════════════════════════════════════════════════════════════
+  Fine-tuning completo | Mejor val_loss: 1.0627
+  Checkpoint: /home/lex/Documentos/gnn_emg (1)/gnn_emg/checkpoints/sich_best.pt
+════════════════════════════════════════════════════════════
